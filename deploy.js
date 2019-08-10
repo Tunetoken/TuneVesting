@@ -21,16 +21,19 @@ const tokens = (tokens) => new BigNumber(tokens).multipliedBy(1e+18).toString();
 
 const deploy = async () => {
   const accounts = await web3.eth.getAccounts();
-
+  let BENEFICIARYADDRESS = accounts[0];
+  let TOKENADDRESS = accounts[0];
+  let STARTINGTIME = Math.floor(Date.now() / 1000);
+  let SET_REVOKABLE = true;
   console.log("Attempting to deploy from ", accounts[0]);
 
-  const result = await new web3.eth.Contract(JSON.parse(tokenVesting.interface))
+  let result = await new web3.eth.Contract(JSON.parse(tokenVesting.interface))
     .deploy({
       data: tokenVesting.bytecode,
       arguments: [
         BENEFICIARYADDRESS, // bene
         TOKENADDRESS, // token
-        STARTINGTIME- Date.now() / 1000, // start
+        STARTINGTIME, // start
         CLIFF_DURATION, //cliff
         TOTAL_VEST_DURATION, // vestDuration
         SET_REVOKABLE, //revoke
@@ -38,11 +41,10 @@ const deploy = async () => {
       ]
     });
 
-  result = result.send({
+  result = await result.send({
       gas: await result.estimateGas(),
       from: accounts[0]
     });
-  result.setProvider(provider);
 
   console.log("Contract deployed to: ", result.options.address);
 };
