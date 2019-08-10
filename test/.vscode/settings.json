@@ -1,0 +1,6 @@
+{
+    "search.usePCRE2": true,
+    "files.associations": {
+        "cmath": "cpp"
+    }
+}

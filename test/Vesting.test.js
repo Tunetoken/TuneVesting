@@ -15,10 +15,7 @@ const {
   TOKENS_PER_MONTH,
   CLIFF_DURATION,
   RELEASABLE_DURATION,
-  TOTAL_VEST_DURATION,
-  FIRST_PHASE,
-  SECOND_PHASE,
-  THIRD_PHASE
+  TOTAL_VEST_DURATION
 } = require("../config");
 
 let vesting;
@@ -136,45 +133,11 @@ describe("Vesting Contract", () => {
     await timeTravel(CLIFF_DURATION);
   });
 
-  for (let i = 1; i <= FIRST_PHASE; i++) {
-    it(`goes into the future by a month`, async () => {
-      await timeTravel(SECONDS_PER_MONTH);
-    });
-
-    it(`allows fetching tokens at ${i} months`, async () => {
-      await vesting.methods.release().send({
-        from: accounts[0],
-        gas: await calculateGas("release")
-      });
-      await outputBlockNumber();
-    });
-
-    it(`beneficiary has balance of ${TOKENS_PER_MONTH * i}`, async () => {
-      const balance = await token.methods.balanceOf(accounts[1]).call({
-        from: accounts[0]
-      });
-      assert.equal(balance, tokens(TOKENS_PER_MONTH * i));
-    });
-
-    it("blocks fetching tokens", async () => {
-      try {
-        const block = await web3.eth.getBlock("latest");
-        await vesting.methods.release().send({
-          from: accounts[0]
-        });
-        assert.fail();
-      } catch (err) {
-        assert.ok(/tokens/.test(err.message));
-      }
-    });
-  }
-
-  it(`sets into the future ${SECOND_PHASE} months`, async () => {
-    await timeTravel(SECONDS_PER_MONTH * SECOND_PHASE);
+  it(`goes into the future by a month`, async () => {
+    await timeTravel(SECONDS_PER_MONTH);
   });
 
-  it(`allows fetching tokens at ${FIRST_PHASE +
-    SECOND_PHASE} months`, async () => {
+  it(`allows fetching tokens at 1 month`, async () => {
     await vesting.methods.release().send({
       from: accounts[0],
       gas: await calculateGas("release")
@@ -182,15 +145,23 @@ describe("Vesting Contract", () => {
     await outputBlockNumber();
   });
 
-  it(`beneficiary has balance of ${(FIRST_PHASE + SECOND_PHASE) *
-    TOKENS_PER_MONTH}`, async () => {
+  it(`beneficiary has balance of ${TOKENS_PER_MONTH}`, async () => {
     const balance = await token.methods.balanceOf(accounts[1]).call({
       from: accounts[0]
     });
-    assert.equal(
-      balance,
-      tokens((FIRST_PHASE + SECOND_PHASE) * TOKENS_PER_MONTH)
-    );
+    assert.equal(balance, tokens(TOKENS_PER_MONTH));
+  });
+
+  it("blocks fetching tokens", async () => {
+    try {
+      const block = await web3.eth.getBlock("latest");
+      await vesting.methods.release().send({
+        from: accounts[0]
+      });
+      assert.fail();
+    } catch (err) {
+      assert.ok(/tokens/.test(err.message));
+    }
   });
 
   it("blocks fetching tokens", async () => {
@@ -217,18 +188,6 @@ describe("Vesting Contract", () => {
     } catch (err) {
       assert.ok(/cannot/.test(err.message));
     }
-  });
-
-  it(`sets into the future ${THIRD_PHASE} months`, async () => {
-    await timeTravel(SECONDS_PER_MONTH * THIRD_PHASE);
-  });
-
-  it(`allows fetching tokens at ${MONTHS_TO_RELEASE} months`, async () => {
-    await vesting.methods.release().send({
-      from: accounts[0],
-      gas: await calculateGas("release")
-    });
-    await outputBlockNumber();
   });
 
   it("beneficieary has all tokens", async () => {
