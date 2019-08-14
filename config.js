@@ -3,10 +3,12 @@ const SECONDS_PER_MONTH = 2628000;
 const MONTHS_TO_CLIFF = 11;
 const MONTHS_TO_RELEASE = 1;
 
-const VESTED_TOKENS = 1200;
+const VESTED_TOKENS = 1000000;
 
-if (VESTED_TOKENS % MONTHS_TO_RELEASE !== 0 ) {
-  throw new ReferenceError("Total vested token amount is not cleanly divisible by the months");
+if (VESTED_TOKENS % MONTHS_TO_RELEASE !== 0) {
+  throw new ReferenceError(
+    "Total vested token amount is not cleanly divisible by the months"
+  );
 }
 
 const TOKENS_PER_MONTH = VESTED_TOKENS / MONTHS_TO_RELEASE;
