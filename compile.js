@@ -34,10 +34,10 @@ const input = {
 };
 
 console.log("Compiling All");
-const compiled = solc.compile({sources: input}, 1);
+const compiled = solc.compile({ sources: input }, 1);
 const tokenVesting = compiled.contracts['TokenVesting.sol:TokenVesting'];
 const erc20 = compiled.contracts['ERC20.sol:ERC20'];
-console.log(compiled.errors)
+if (compiled.errors) console.error(compiled.errors);
 
 module.exports = {
   tokenVesting: {
