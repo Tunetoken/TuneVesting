@@ -28,7 +28,7 @@ const deploy = async (from, address, tokenAmount) => {
   const result = await new web3.eth.Contract(
     JSON.parse(tokenVesting.interface)
   ).deploy({
-    data: tokenVesting.bytecode,
+    data: '0x' + tokenVesting.bytecode,
     arguments: [
       address, // bene
       TOKEN_ADDRESS, // token
