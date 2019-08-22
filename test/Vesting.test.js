@@ -54,7 +54,7 @@ before(async () => {
   token = await new web3.eth.Contract(JSON.parse(erc20.interface))
     .deploy({
       data: erc20.bytecode,
-      arguments: [accounts[0], tokens(VESTED_TOKENS)]
+      arguments: [accounts[0], tokens(VESTED_TOKENS[0])]
     })
     .send({
       from: accounts[2],
@@ -74,7 +74,7 @@ before(async () => {
       CLIFF_DURATION, //cliff
       TOTAL_VEST_DURATION, // vestDuration
       false, //revoke
-      tokens(VESTED_TOKENS) // totalTokens
+      tokens(VESTED_TOKENS[0]) // totalTokens
     ]
   });
   const gas = await vesting.estimateGas();
@@ -92,7 +92,7 @@ describe("Vesting Contract", () => {
 
   it("tokens are transferred to vesting contract", async () => {
     await token.methods
-      .transfer(vesting.options.address, tokens(VESTED_TOKENS))
+      .transfer(vesting.options.address, tokens(VESTED_TOKENS[0]))
       .send({
         from: accounts[0]
       });
@@ -104,7 +104,7 @@ describe("Vesting Contract", () => {
       .call({
         from: accounts[0]
       });
-    assert.equal(balance, tokens(VESTED_TOKENS));
+    assert.equal(balance, tokens(VESTED_TOKENS[0]));
   });
 
   it(`vesting contract has ${MONTHS_TO_RELEASE} months for the duration`, async () => {
@@ -192,7 +192,7 @@ describe("Vesting Contract", () => {
     const balance = await token.methods.balanceOf(accounts[1]).call({
       from: accounts[0]
     });
-    assert.equal(balance, tokens(VESTED_TOKENS));
+    assert.equal(balance, tokens(VESTED_TOKENS[0]));
   });
 
   it("blocks fetching tokens", async () => {
