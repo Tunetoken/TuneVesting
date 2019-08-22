@@ -39,21 +39,19 @@ const deploy = async (from, address, tokenAmount) => {
       tokens(tokenAmount) // totalTokens
     ]
   });
-
   
-  console.log("Contract belongs to:", address);
-  const web3Gas = await web3.utils.toWei("5", "gwei");
-  const deployResult = await result.send({ 
-    gasPrice: web3Gas, gas: 2000000, from
-  });
-  console.log("Contract deployed to: ", deployResult.options);
+  console.log("Vesting contract for:", address);
+  const deployResult = await result.send({ from });
+  console.log("      is deployed at:", deployResult.options.address, '\n');
 };
 
 const deployAll = async () => {
   const account = (await web3.eth.getAccounts())[0];
+  console.log('\n');
   for (let i = 0; i < BENEFICIARY_ADDRESSES.length; i++) {
     await deploy(account, BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i]);
   }
+  console.log("all done 🎉");
 }
 
 deployAll();
