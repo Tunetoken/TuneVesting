@@ -41,13 +41,14 @@ const deploy = async (from, address, tokenAmount) => {
   });
   
   console.log("Vesting contract for:", address);
+  console.log("         token count:", tokenAmount);
   const deployResult = await result.send({ from });
-  console.log("      is deployed at:", deployResult.options.address, '\n');
+  console.log("         deployed at:", deployResult.options.address, '\n');
 };
 
 const deployAll = async () => {
   const account = (await web3.eth.getAccounts())[0];
-  console.log('\n');
+  console.log('');
   for (let i = 0; i < BENEFICIARY_ADDRESSES.length; i++) {
     await deploy(account, BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i]);
   }

@@ -2,25 +2,12 @@ const path = require('path');
 const fs = require('fs');
 const solc = require('solc');
 
-console.log("Finding IERC20");
 const ierc20Source = fs.readFileSync(path.resolve(__dirname, 'contracts', 'IERC20.sol'), 'utf8');
-
-console.log("Finding SafeMath");
 const safeMathSource = fs.readFileSync(path.resolve(__dirname, 'contracts', 'SafeMath.sol'), 'utf8');
-
-console.log("Finding SafeMath64");
 const safeMath64Source = fs.readFileSync(path.resolve(__dirname, 'contracts', 'SafeMath64.sol'), 'utf8');
-
-console.log("Finding Ownable");
 const ownableSource = fs.readFileSync(path.resolve(__dirname, 'contracts', 'Ownable.sol'), 'utf8');
-
-console.log("Finding SafeERC20");
 const safeSource = fs.readFileSync(path.resolve(__dirname, 'contracts', 'SafeERC20.sol'), 'utf8');
-
-console.log("Finding ERC20");
 const erc20Source = fs.readFileSync(path.resolve(__dirname, 'contracts', 'ERC20.sol'), 'utf8');
-
-console.log("Finding TokenVesting");
 const vestSource = fs.readFileSync(path.resolve(__dirname, 'contracts', 'TokenVesting.sol'), 'utf8');
 
 const input = {
@@ -33,11 +20,12 @@ const input = {
   'ERC20.sol': erc20Source,
 };
 
-console.log("Compiling All");
+console.log("Compiling contracts...");
 const compiled = solc.compile({ sources: input });
 const tokenVesting = compiled.contracts['TokenVesting.sol:TokenVesting'];
 const erc20 = compiled.contracts['ERC20.sol:ERC20'];
 if (compiled.errors) console.error(compiled.errors);
+console.log("Compiling done!")
 
 module.exports = {
   tokenVesting: {
