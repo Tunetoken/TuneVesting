@@ -13,7 +13,8 @@
     "web3": "^1.2.1"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "deploy": "node deploy.js"
   },
   "engineStrict": true,
   "engines": {
