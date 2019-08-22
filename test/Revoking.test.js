@@ -9,12 +9,10 @@ const { tokenVesting, erc20 } = require("../compile");
 
 const {
   SECONDS_PER_MONTH,
-  MONTHS_TO_CLIFF,
   MONTHS_TO_RELEASE,
   VESTED_TOKENS,
   TOKENS_PER_MONTH,
   CLIFF_DURATION,
-  RELEASABLE_DURATION,
   TOTAL_VEST_DURATION
 } = require("../config");
 
