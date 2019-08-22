@@ -20,12 +20,12 @@ const input = {
   'ERC20.sol': erc20Source,
 };
 
-console.log("Compiling contracts...");
+console.log("\nCompiling contracts...");
 const compiled = solc.compile({ sources: input });
 const tokenVesting = compiled.contracts['TokenVesting.sol:TokenVesting'];
 const erc20 = compiled.contracts['ERC20.sol:ERC20'];
 if (compiled.errors) console.error(compiled.errors);
-console.log("Compiling done!")
+console.log("Compiling done!\n")
 
 module.exports = {
   tokenVesting: {
