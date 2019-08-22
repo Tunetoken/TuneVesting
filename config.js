@@ -1,33 +1,46 @@
+require('dotenv').config()
+
 const SECONDS_PER_MONTH = 2628000;
 
-const MONTHS_TO_CLIFF = 11;
-const MONTHS_TO_RELEASE = 1;
+const MONTHS_TO_CLIFF = process.env.MONTHS_TO_CLIFF;
+const MONTHS_TO_RELEASE = process.env.MONTHS_TO_RELEASE;
+const TOKEN_ADDRESS = process.env.TOKEN_ADDRESS
+const VESTED_TOKENS = process.env.VESTED_TOKENS.split(',');
+const BENEFICIARY_ADDRESSES = process.env.BENEFICIARY_ADDRESSES.split(',');
+const REVOKABLE = process.env.REVOKABLE === 'true';
 
-const VESTED_TOKENS = 1000000;
-
-if (VESTED_TOKENS % MONTHS_TO_RELEASE !== 0) {
+if (BENEFICIARY_ADDRESSES.length != VESTED_TOKENS.length) {
   throw new ReferenceError(
-    "Total vested token amount is not cleanly divisible by the months"
-  );
+    `Addresses length (${BENEFICIARY_ADDRESSES.length}) must equal vested tokens length (${VESTED_TOKENS.length})`
+  )
 }
 
-const TOKENS_PER_MONTH = VESTED_TOKENS / MONTHS_TO_RELEASE;
+VESTED_TOKENS.forEach(amount => {
+  if (amount % MONTHS_TO_RELEASE !== 0) {
+    throw new ReferenceError(
+      `Total vested token amount (${amount}) is not cleanly divisible by the months (${MONTHS_TO_RELEASE})`
+    );
+  }
+});
+
+const TOKENS_PER_MONTH = VESTED_TOKENS.map(amount => amount / MONTHS_TO_RELEASE);
 
 const CLIFF_DURATION = SECONDS_PER_MONTH * MONTHS_TO_CLIFF;
 const RELEASABLE_DURATION = SECONDS_PER_MONTH * MONTHS_TO_RELEASE;
 const TOTAL_VEST_DURATION = RELEASABLE_DURATION + CLIFF_DURATION;
 
 if (RELEASABLE_DURATION % SECONDS_PER_MONTH !== 0) {
-  throw new ReferenceError("Releasable duration is a multiple of months");
+  throw new ReferenceError("Releasable duration is not a multiple of months");
 }
 
 module.exports = {
   SECONDS_PER_MONTH,
-  MONTHS_TO_CLIFF,
   MONTHS_TO_RELEASE,
   VESTED_TOKENS,
   TOKENS_PER_MONTH,
   CLIFF_DURATION,
-  RELEASABLE_DURATION,
-  TOTAL_VEST_DURATION
+  TOTAL_VEST_DURATION,
+  BENEFICIARY_ADDRESSES,
+  TOKEN_ADDRESS,
+  REVOKABLE
 };
