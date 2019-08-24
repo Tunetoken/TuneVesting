@@ -17,17 +17,6 @@ if (
   throw new ReferenceError("Lengths of inputs don't match up")
 }
 
-for (let i = 0; i < VESTED_TOKENS.length; i++) {
-  const amount = VESTED_TOKENS[i];
-  const monthsToRelease = MONTHS_TO_RELEASE[i];
-
-  if (amount % monthsToRelease !== 0) {
-    throw new ReferenceError(
-      `Total vested token amount (${amount}) is not cleanly divisible by the months (${monthsToRelease})`
-    );
-  }
-}
-
 const TOKENS_PER_MONTH = VESTED_TOKENS.map((amount, i) => amount / MONTHS_TO_RELEASE[i]);
 
 const CLIFF_DURATIONS = MONTHS_TO_CLIFF.map(months => months * SECONDS_PER_MONTH);
