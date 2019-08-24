@@ -13,8 +13,8 @@ const web3 = new Web3(provider);
 
 const {
   VESTED_TOKENS,
-  CLIFF_DURATION,
-  TOTAL_VEST_DURATION,
+  CLIFF_DURATIONS,
+  TOTAL_VEST_DURATIONS,
   BENEFICIARY_ADDRESSES,
   TOKEN_ADDRESS,
   REVOKABLE
@@ -22,19 +22,21 @@ const {
 
 const tokens = tokens => new BigNumber(tokens).multipliedBy(1e18).toString();
 
-const deploy = (from, address, tokenAmount) => {
+const deploy = (from, address, tokenAmount, cliffDuration, totalVestDuration) => {
   return new Promise((resolve, reject) => {
     const STARTING_TIME = Math.floor(Date.now() / 1000);
 
     console.log("Vesting contract for:", address);
     console.log("         token count:", tokenAmount);
+    console.log("      cliff duration:", cliffDuration);
+    console.log(" total vest duration:", totalVestDuration);
 
     return new web3.eth.Contract(JSON.parse(tokenVesting.interface))
       .deploy({
         data: '0x' + tokenVesting.bytecode,
         arguments: [
-          address, TOKEN_ADDRESS, STARTING_TIME, CLIFF_DURATION,
-          TOTAL_VEST_DURATION, REVOKABLE, tokens(tokenAmount)
+          address, TOKEN_ADDRESS, STARTING_TIME, cliffDuration,
+          totalVestDuration, REVOKABLE, tokens(tokenAmount)
         ]
       })
       .send({ from })
@@ -52,7 +54,7 @@ const deploy = (from, address, tokenAmount) => {
 const deployAll = () => {
   return web3.eth.getAccounts().then(async accounts => {
     for (let i = 0; i < BENEFICIARY_ADDRESSES.length; i++) {
-      await deploy(accounts[0], BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i]);
+      await deploy(accounts[0], BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i], CLIFF_DURATIONS[i], TOTAL_VEST_DURATIONS[i]);
     }
   }).then(() => {
     console.log("All done 🎉");
