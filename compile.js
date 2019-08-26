@@ -20,20 +20,14 @@ const input = {
   'ERC20.sol': erc20Source,
 };
 
-console.log("\nCompiling contracts...");
-const compiled = solc.compile({ sources: input });
-const tokenVesting = compiled.contracts['TokenVesting.sol:TokenVesting'];
-const erc20 = compiled.contracts['ERC20.sol:ERC20'];
-if (compiled.errors) console.error(compiled.errors);
-console.log("Compiling done!\n")
+const compile = () => {
+  return new Promise((resolve, reject) => {
+    const compiled = solc.compile({ sources: input });
+    const tokenVesting = compiled.contracts['TokenVesting.sol:TokenVesting'];
+    const erc20 = compiled.contracts['ERC20.sol:ERC20'];
+    if (compiled.errors) reject(compiled.errors);
+    resolve({ tokenVesting, erc20 })
+  });
+}
 
-module.exports = {
-  tokenVesting: {
-    interface: tokenVesting.interface,
-    bytecode: tokenVesting.bytecode,
-  },
-  erc20: {
-    interface: erc20.interface,
-    bytecode: erc20.bytecode,
-  },
-};
+module.exports = compile;
