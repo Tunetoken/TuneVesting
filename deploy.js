@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const HDWalletProvider = require("truffle-hdwallet-provider");
 const Web3 = require("web3");
@@ -22,37 +22,45 @@ const {
 
 const tokens = tokens => new BigNumber(tokens).multipliedBy(1e18).toString();
 
-const deploy = async (from, address, tokenAmount) => {
-  const STARTING_TIME = Math.floor(Date.now() / 1000);
+const deploy = (from, address, tokenAmount) => {
+  return new Promise((resolve, reject) => {
+    const STARTING_TIME = Math.floor(Date.now() / 1000);
 
-  const result = await new web3.eth.Contract(
-    JSON.parse(tokenVesting.interface)
-  ).deploy({
-    data: '0x' + tokenVesting.bytecode,
-    arguments: [
-      address, // bene
-      TOKEN_ADDRESS, // token
-      STARTING_TIME, // start
-      CLIFF_DURATION, //cliff
-      TOTAL_VEST_DURATION, // vestDuration
-      REVOKABLE, //revoke
-      tokens(tokenAmount) // totalTokens
-    ]
+    console.log("Vesting contract for:", address);
+    console.log("         token count:", tokenAmount);
+
+    return new web3.eth.Contract(JSON.parse(tokenVesting.interface))
+      .deploy({
+        data: '0x' + tokenVesting.bytecode,
+        arguments: [
+          address, TOKEN_ADDRESS, STARTING_TIME, CLIFF_DURATION,
+          TOTAL_VEST_DURATION, REVOKABLE, tokens(tokenAmount)
+        ]
+      })
+      .send({ from })
+      .on('error', error => reject(error))
+      .on('transactionHash', txHash => console.log("  mining transaction:", txHash))
+      .on('confirmation', (confirmationNumber, receipt) => {
+        if (confirmationNumber === 2) {
+          console.log("         deployed at:", receipt.contractAddress, "\n");
+          resolve();
+        }
+      });
   });
-  
-  console.log("Vesting contract for:", address);
-  console.log("         token count:", tokenAmount);
-  const deployResult = await result.send({ from });
-  console.log("         deployed at:", deployResult.options.address, '\n');
 };
 
-const deployAll = async () => {
-  const account = (await web3.eth.getAccounts())[0];
-  console.log('');
-  for (let i = 0; i < BENEFICIARY_ADDRESSES.length; i++) {
-    await deploy(account, BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i]);
-  }
-  console.log("all done 🎉");
+const deployAll = () => {
+  return web3.eth.getAccounts().then(async accounts => {
+    for (let i = 0; i < BENEFICIARY_ADDRESSES.length; i++) {
+      await deploy(accounts[0], BENEFICIARY_ADDRESSES[i], VESTED_TOKENS[i]);
+    }
+  }).then(() => {
+    console.log("All done 🎉");
+    process.exit();
+  }).catch(err => {
+    console.error(err);
+    process.exit();
+  });
 }
 
 deployAll();
